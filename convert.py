@@ -151,7 +151,7 @@ class Article(object):
         else:
             self.title_image = imgs[0].attrib["src"]
 
-    def parse_content(self, element):
+    def parse_article(self, element):
         result = []
         for e in element:
             block = Block(e)
@@ -185,11 +185,11 @@ def get_zhihu_content(url):
     layout_main_div = layout_main_divs[0]
 
     article = Article()
-    title_div = layout_main_div.xpath('.//div[contains(@class, "Post-content")]')[0]
-    article.parse_title(title_div)
+    content_div = layout_main_div.xpath('.//div[contains(@class, "Post-content")]')[0]
+    article.parse_title(content_div)
 
-    article_div = title_div.xpath('.//div[contains(@class, "RichText Post-RichText")]')[0]
-    article.parse_content(article_div)
+    article_div = content_div.xpath('.//div[contains(@class, "Post-RichText")]')[0]
+    article.parse_article(article_div)
 
     return article
 
