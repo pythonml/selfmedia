@@ -73,6 +73,15 @@ class Block(object):
                 md += "* {}\n".format(node_md)
             return md
 
+        if element.tag == "li":
+            md = "" if element.text is None else Block.escape_underscore(element.text)
+            for node in element:
+                node_md = Block.html2md(node)
+                md += node_md
+                node_tail = "" if node.tail is None else Block.escape_underscore(node.tail)
+                md += node_tail
+            return md
+
         if element.tag == "hr":
             md = "---\n"
             return md
