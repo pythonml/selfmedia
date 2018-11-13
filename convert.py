@@ -70,7 +70,11 @@ class Block(object):
             md = ""
             for node in element:
                 node_md = Block.html2md(node)
-                md += "* {}\n".format(node_md)
+                md += "{}\n".format(node_md)
+            return md
+
+        if element.tag == "li":
+            md = "+ {}".format(element.text)
             return md
 
         if element.tag == "hr":
