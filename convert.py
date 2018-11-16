@@ -125,6 +125,11 @@ class Block(object):
             md = "> {}".format(md)
             return md
 
+        if element.tag == "img":
+            img_url = element.attrib["src"]
+            md = "![]({})".format(img_url)
+            return md
+
         raise Exception("unrecognized tag {}".format(element.tag))
 
     def __repr__(self):
