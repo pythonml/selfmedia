@@ -70,7 +70,11 @@ class Block(object):
             md = ""
             for node in element:
                 node_md = Block.html2md(node)
-                md += "* {}\n".format(node_md)
+                md += "{}\n".format(node_md)
+            return md
+
+        if element.tag == "li":
+            md = "+ {}".format(element.text)
             return md
 
         if element.tag == "li":
@@ -128,6 +132,11 @@ class Block(object):
                 node_tail = "" if node.tail is None else Block.escape_underscore(node.tail)
                 md += node_tail
             md = "> {}".format(md)
+            return md
+
+        if element.tag == "img":
+            img_url = element.attrib["src"]
+            md = "![]({})".format(img_url)
             return md
 
         raise Exception("unrecognized tag {}".format(element.tag))
