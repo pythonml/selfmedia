@@ -43,9 +43,14 @@ class Block(object):
 
         # head
         if element.tag == "h2":
-            text = Block.escape_underscore(element.text)
-            md = "#### {}".format(text)
-            return md
+            if len(element) == 0:
+                text = Block.escape_underscore(element.text)
+                md = "#### {}".format(text)
+                return md
+            elif len(element) == 1:
+                node = element[0]
+                md = Block.html2md(node)
+                return "#### {}".format(md)
 
         # html
         if element.tag == "p":
@@ -139,6 +144,15 @@ class Block(object):
             md = "![]({})".format(img_url)
             return md
 
+        if element.tag == "span":
+            md = "" if element.text is None else Block.escape_underscore(element.text)
+            for node in element:
+                node_md = Block.html2md(node)
+                md += node_md
+                node_tail = "" if node.tail is None else Block.escape_underscore(node.tail)
+                md += node_tail
+            return md
+
         raise Exception("unrecognized tag {}".format(element.tag))
 
     def __repr__(self):
@@ -180,7 +194,10 @@ class Article(object):
         return name
 
 def get_zhihu_content(url):
-    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+        "cookie": 'l_n_c=1; q_c1=26596025157e479497dd932c818b7014|1543146569000|1543146569000; n_c=1; d_c0="ACAii6zAkg6PTvUyPFB7Mt24tIPRt3y-lz4=|1543146571"; _xsrf=F3RL0aj78CMeNwzJ64IN210PT61f6gOl; __utmc=51854390; _zap=8cde3dcd-10b6-4775-8344-1d35d0c240be; l_cap_id="ZmRlYWJhYTY1Y2YwNDFkYWI2MWNjNDRkODgyNzBiMDQ=|1543150543|acabb7e0c5ac3321d1d9ac01d824405e5cd4f386"; r_cap_id="ODI5NTMxNjNmZWZhNGJkZGIxYzcyMDNkMzA3NDU4NmM=|1543150543|7e2ea2c3b4c8ba61f89026ce923050c8c5b788c2"; cap_id="MGFjZmEyYmI3NjAxNDdhYmEyMDU4NjEwNDljZmY5Yjk=|1543150543|51917d4bd59daf3d875bce046dda1472b382f678"; tst=r; __utma=51854390.171130502.1543146572.1543149217.1543230832.3; __utmz=51854390.1543230832.3.2.utmcsr=zhihu.com|utmccn=(referral)|utmcmd=referral|utmcct=/; __utmv=51854390.100-1|2=registration_date=20111130=1^3=entry_date=20111130=1; XSRF-TOKEN=2|8655f943|c066ab0fb6349374be16b426c8228309b061b00db464c913d263c825b032b62f|1543234431; tgw_l7_route=23ddf1acd85bb5988efef95d7382daa0; capsion_ticket="2|1:0|10:1543234818|14:capsion_ticket|44:ZjZhYWMyOWVlYjRmNDc2YTlhNTQ4YjI2OTlmODgyMGI=|cc7edbd0707ff05a526b8435bf87b6e77b9b9d6527161c71ac041fc8757a2e1d"; z_c0="2|1:0|10:1543234824|4:z_c0|92:Mi4xd25NQ0FBQUFBQUFBSUNLTHJNQ1NEaVlBQUFCZ0FsVk5DRFBwWEFCQy1tcVc2cTlRNWgySDUxNHJCTmNHb21iNEF3|533b17585441951cb4ef1ec7d4f000766492529fec47b9e9d9bdfbdb747ce441"'
+    }
     r = requests.get(url, headers=headers)
     content = r.content.decode("utf-8")
     tree = html.fromstring(content)
